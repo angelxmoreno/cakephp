@@ -20,6 +20,11 @@
 
 App::uses('TaskCollection', 'Console');
 App::uses('Shell', 'Console');
+/**
+ * Extended Task
+ */
+class DbConfigAliasedTask extends Shell {
+}
 
 class TaskCollectionTest extends CakeTestCase {
 
@@ -85,7 +90,7 @@ class TaskCollectionTest extends CakeTestCase {
 /**
  * test loading a plugin helper.
  *
- * @return void
+ * @return voiddiver
  */
 	public function testLoadPluginTask() {
 		$dispatcher = $this->getMock('ShellDispatcher', array(), array(), '', false);
@@ -122,4 +127,24 @@ class TaskCollectionTest extends CakeTestCase {
 		$this->assertEquals(array('Extract'), $result, 'loaded tasks is wrong');
 	}
 
+/**
+ * Tests loading as an alias
+ *
+ * @return void
+ */
+    public function testLoadWithAlias() {
+        $result = $this->Tasks->load('DbConfig', array('className' => 'DbConfigAliased'));
+        $this->assertInstanceOf('DbConfigAliasedTask', $result);
+        $this->assertInstanceOf('DbConfigAliasedTask', $this->Tasks->DbConfig);
+
+        $result = $this->Tasks->loaded();
+        $this->assertEquals(array('DbConfig'), $result, 'loaded() results are wrong.');
+
+        $result = $this->Tasks->load('SomeTask', array('className' => 'TestPlugin.OtherTask'));
+        $this->assertInstanceOf('OtherTaskTask', $result);
+        $this->assertInstanceOf('OtherTaskTask', $this->Tasks->SomeTask);
+
+        $result = $this->Tasks->loaded();
+        $this->assertEquals(array('DbConfig', 'SomeTask'), $result, 'loaded() results are wrong.');
+     }
 }
